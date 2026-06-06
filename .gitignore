@@ -1,5 +1,7 @@
 *.sw*
 *.pyc
+.idea/
+*.egg-info/
 out
 finder-out
 process-out

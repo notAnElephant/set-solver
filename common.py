@@ -3,6 +3,7 @@
 
 import os
 import shutil
+from pathlib import Path
 import cv2
 import numpy as np
 
@@ -11,12 +12,13 @@ import numpy as np
 # Constants #
 #############
 
-CARD_FINDER_OUT_DIR = "finder-out"
-PROCESS_CARD_OUT_DIR = "process-out"
-SHAPES_OUT_DIR = "shapes-out"
-SOLVE_OUT = "solve-out"
+PROJECT_ROOT = Path(__file__).resolve().parent
+CARD_FINDER_OUT_DIR = str(PROJECT_ROOT / "finder-out")
+PROCESS_CARD_OUT_DIR = str(PROJECT_ROOT / "process-out")
+SHAPES_OUT_DIR = str(PROJECT_ROOT / "shapes-out")
+SOLVE_OUT = str(PROJECT_ROOT / "solve-out")
 
-IM_DATA_DIR = "image-data"
+IM_DATA_DIR = str(PROJECT_ROOT / "image-data")
 
 # sample images of set games
 SET_GAMES_DIR = os.path.join(IM_DATA_DIR, "set-games")
