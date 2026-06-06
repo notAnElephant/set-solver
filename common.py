@@ -81,12 +81,22 @@ def display_im(im, imgname="image", resize=True):
     cv2.destroyAllWindows()
 
 
+def find_contours(*args, **kwargs):
+    """Compat wrapper for OpenCV 3/4 findContours return values."""
+    result = cv2.findContours(*args, **kwargs)
+    if len(result) == 3:
+        _, contours, hierarchy = result
+    else:
+        contours, hierarchy = result
+    return contours, hierarchy
+
+
 def jpgs_in_dir(dir):
     return [f for f in os.listdir(dir) if f[-4:] == ".jpg"]
 
 
 def mean(ns):
-    return sum(ns) / (len(ns) or 1)
+    return sum(int(n) for n in ns) / (len(ns) or 1)
 
 
 def median(ns):

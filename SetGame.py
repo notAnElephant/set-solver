@@ -5,7 +5,11 @@ from random import randint, shuffle
 from itertools import permutations, combinations
 import cv2
 import numpy as np
-from tqdm import tqdm
+try:
+    from tqdm import tqdm
+except ImportError:
+    def tqdm(iterable):
+        return iterable
 from common import (
     SOLVE_OUT,
     clean_make_dir,

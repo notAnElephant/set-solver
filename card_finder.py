@@ -18,9 +18,9 @@ from common import (
     clean_make_dir,
     write_im,
     display_im,
-    mean,
     median,
     rectify,
+    find_contours,
 )
 
 # technically there's a possibility of 18 cards required:
@@ -74,9 +74,7 @@ def find_cards(
     flag, thresh = cv2.threshold(blur, THRESH_MIN, 255, cv2.THRESH_BINARY)
 
     # `image` is the thrown away value
-    _, contours, hierarchy = cv2.findContours(
-        thresh, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE
-    )
+    contours, hierarchy = find_contours(thresh, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
 
     # sort contours by largest volume
     contours = sorted(contours, key=cv2.contourArea, reverse=True)

@@ -3,11 +3,12 @@
 
 import os
 import sys
+from collections import Counter
 import cv2
 from extract_shapes import extract_shapes_from_im
 from label_all_cards import manually_label_card
 from process_card import noteshrink_card_from_im
-from common import ALL_SHAPES_DIR, mean, jpgs_in_dir
+from common import ALL_SHAPES_DIR, mean, jpgs_in_dir, label_to_dict
 from vendor.noteshrink import CannotGetPalette
 
 
@@ -68,9 +69,9 @@ def get_best_orb_matches(card_im, shapes_dir=ALL_SHAPES_DIR, canny=False):
 
 def pixels_mean(pixels):
     """Input is a list of (R,G,B) tuples, output is the average (R,G,B) value."""
-    rs = [p[0] for p in pixels]
-    gs = [p[1] for p in pixels]
-    bs = [p[2] for p in pixels]
+    rs = [int(p[0]) for p in pixels]
+    gs = [int(p[1]) for p in pixels]
+    bs = [int(p[2]) for p in pixels]
     return (mean(rs), mean(gs), mean(bs))
 
 
@@ -84,7 +85,7 @@ def shape_rgb(card_im):
     non_whites = []
     for row in shrunk_im:
         for pixel in row:
-            if sum(pixel) < 255 * 3:
+            if sum(int(channel) for channel in pixel) < 255 * 3:
                 non_whites.append(pixel)
     return pixels_mean(non_whites)
 
@@ -116,28 +117,29 @@ def classify_number_from_shapes(shapes):
     return ["", "single", "double", "triple"][num_shapes]
 
 
+def most_common_attr(matches, attr_name):
+    attrs = [label_to_dict(label)[attr_name] for _, label in matches]
+    return Counter(attrs).most_common(1)[0][0]
+
+
 def classify_card_from_im(card_im):
     """Classify the card's attributes, returning a label like
   red-triple-outline-squiggle.jpg."""
     shapes = get_best_orb_matches(card_im, canny=True)
-    shades = get_best_orb_matches(card_im)
     color = classify_color(card_im)
     number = classify_number_from_shapes(shapes)
 
-    if any([(not attr) for attr in (shapes, shades, color, number)]):
+    if any([(not attr) for attr in (shapes, color, number)]):
         print(
             "Could not classify at least one of the attributes of this card. "
             "Please enter the attribute labels manually."
         )
         color, number, shade, shape = manually_label_card(card_im)
     else:
-        ret = shapes[0][1]
-        _, _, _, shape = ret.split("-")
+        shape = most_common_attr(shapes, "shape")
+        shade = most_common_attr(shapes, "shade")
 
-        ret = shades[0][1]
-        _, _, shade, _ = ret.split("-")
-
-    return "-".join([color, number, shade, shape])
+    return "-".join([color, number, shade, shape]) + ".jpg"
 
 
 def classify_card_from_file(card_file_to_classify):

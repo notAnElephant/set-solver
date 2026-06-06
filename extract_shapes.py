@@ -9,9 +9,9 @@ from common import (
     SHAPES_OUT_DIR,
     display_im,
     write_im,
-    clean_make_dir,
     rectify,
     scale_points,
+    find_contours,
 )
 
 # min channel cutoff for the threshold filter
@@ -33,7 +33,7 @@ def extract_shapes_from_im(
     thresh = cv2.bitwise_not(thresh)
 
     # `image` is the thrown away value
-    _, contours, hierarchy = cv2.findContours(
+    contours, hierarchy = find_contours(
         thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE
     )
 
